@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生阅读检查系统</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://via.placeholder.com/1920x1080/32CD32/FFFFFF?text=绿色盎然生机'); /* 替换为你的绿色背景图片URL */
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            max-width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .question {
+            margin: 20px 0;
+            text-align: left;
+        }
+        .correct {
+            color: green;
+            font-weight: bold;
+        }
+        .incorrect {
+            color: red;
+            font-weight: bold;
+        }
+        .footer {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>学生阅读检查系统</h1>
+        <div id="inputSection">
+            <input type="text" id="bookName" placeholder="请输入书名（例如：夏洛的网）">
+            <button onclick="loadQuestions()">进入</button>
+        </div>
+        <div id="questionSection" style="display: none;">
+            <div id="questions"></div>
+            <button onclick="showAnswers()">显示正确答案</button>
+            <button onclick="calculateAccuracy()">计算正确率</button>
+        </div>
+    </div>
+
+    <div class="footer">小王同学制作</div>
+
+    <script>
+        const questions = [
+            {
+                question: "1. What did Mr. Arable carry inside the carton?",
+                options: ["A. some milk", "B. a pig", "C. some people"],
+                answer: "B"
+            },
+            {
+                question: "2. How did Fern go to school?",
+                options: ["A. on her bike", "B. on foot", "C. by bus"],
+                answer: "C"
+            },
+            {
+                question: "3. What did Fern give to Wilbur?",
+                options: ["A. milk", "B. hay", "C. some apples"],
+                answer: "A"
+            },
+            {
+                question: "4. When was Wilbur born?",
+                options: ["A. spring", "B. summer", "C. fall"],
+                answer: "A"
+            },
+            {
+                question: "5. Who agreed to buy Wilbur for $6?",
+                options: ["A. Avery", "B. Fern's teacher", "C. Uncle Homer"],
+                answer: "C"
+            }
+        ];
+
+        const correctAnswers = ["B", "C", "A", "A", "C"]; // 正确答案
+        let userAnswers = [];
+
+        function loadQuestions() {
+            const bookName = document.getElementById('bookName').value;
+            if (bookName === "夏洛的网") {
+                document.getElementById('inputSection').style.display = 'none';
+                document.getElementById('questionSection').style.display = 'block';
+
+                const questionsDiv = document.getElementById('questions');
+                questionsDiv.innerHTML = '';
+                questions.forEach((q, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'question';
+                    div.innerHTML = `
+                        <p>${q.question}</p>
+                        ${q.options.map(opt => `
+                            <label>
+                                <input type="radio" name="question${index}" value="${opt[0]}"> ${opt}
+                            </label><br>
+                        `).join('')}
+                    `;
+                    questionsDiv.appendChild(div);
+                });
+            } else {
+                alert("请输入正确的书名：夏洛的网");
+            }
+        }
+
+        function showAnswers() {
+            const questionsDiv = document.getElementById('questions');
+            questions.forEach((q, index) => {
+                const options = questionsDiv.querySelectorAll(`input[name="question${index}"]`);
+                options.forEach(opt => {
+                    const label = opt.parentElement;
+                    if (opt.value === correctAnswers[index]) {
+                        label.classList.add('correct'); // 正确答案显示绿色
+                    } else if (opt.checked && opt.value !== correctAnswers[index]) {
+                        label.classList.add('incorrect'); // 错误答案显示红色
+                    }
+                });
+            });
+        }
+
+        function calculateAccuracy() {
+            userAnswers = [];
+            questions.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="question${index}"]:checked`);
+                userAnswers.push(selected ? selected.value : '');
+            });
+
+            let correctCount = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === correctAnswers[index]) {
+                    correctCount++;
+                }
+            });
+
+            const accuracy = (correctCount / questions.length) * 100;
+            alert(`你的正确率是: ${accuracy.toFixed(2)}%`);
+        }
+    </script>
+</body>
+</html>
