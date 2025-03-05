@@ -3,163 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>学生阅读检查系统</title>
+    <title>10以内加减法练习</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-image: url('https://via.placeholder.com/1920x1080/32CD32/FFFFFF?text=绿色盎然生机'); /* 替换为你的绿色背景图片URL */
-            background-size: cover;
-            background-position: center;
-            margin: 0;
-            padding: 0;
+            background-color: #f0f8ff; /* 浅蓝色背景 */
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            margin: 0;
+            flex-direction: column;
         }
         .container {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 80%;
-            max-width: 600px;
             text-align: center;
-        }
-        input, button {
-            margin: 10px 0;
-            padding: 10px;
-            width: 100%;
-            max-width: 300px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         .question {
+            font-size: 2em;
             margin: 20px 0;
-            text-align: left;
         }
-        .correct {
-            color: green;
-            font-weight: bold;
+        .buttons {
+            margin-top: 20px;
         }
-        .incorrect {
-            color: red;
-            font-weight: bold;
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            color: white;
+        }
+        #startBtn {
+            background-color: green; /* 开始按钮为绿色 */
+        }
+        #pauseBtn {
+            background-color: red; /* 暂停按钮为红色 */
+        }
+        #answerBtn {
+            background-color: pink; /* 查看答案按钮为粉色 */
         }
         .footer {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            font-size: 12px;
+            margin-top: 20px;
+            font-size: 0.8em;
             color: #333;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>学生阅读检查系统</h1>
-        <div id="inputSection">
-            <input type="text" id="bookName" placeholder="请输入书名（例如：夏洛的网）">
-            <button onclick="loadQuestions()">进入</button>
-        </div>
-        <div id="questionSection" style="display: none;">
-            <div id="questions"></div>
-            <button onclick="showAnswers()">显示正确答案</button>
-            <button onclick="calculateAccuracy()">计算正确率</button>
+        <div class="question" id="question">点击“开始”按钮</div>
+        <div class="buttons">
+            <button id="startBtn" onclick="startRolling()">开始</button>
+            <button id="pauseBtn" onclick="pauseRolling()">暂停</button>
+            <button id="answerBtn" onclick="showAnswer()" disabled>查看答案</button>
         </div>
     </div>
-
-    <div class="footer">小王同学制作</div>
+    <div class="footer">由小王同学制作</div>
 
     <script>
+        // 题目数组（100道10以内的加减法）
         const questions = [
-            {
-                question: "1. What did Mr. Arable carry inside the carton?",
-                options: ["A. some milk", "B. a pig", "C. some people"],
-                answer: "B"
-            },
-            {
-                question: "2. How did Fern go to school?",
-                options: ["A. on her bike", "B. on foot", "C. by bus"],
-                answer: "C"
-            },
-            {
-                question: "3. What did Fern give to Wilbur?",
-                options: ["A. milk", "B. hay", "C. some apples"],
-                answer: "A"
-            },
-            {
-                question: "4. When was Wilbur born?",
-                options: ["A. spring", "B. summer", "C. fall"],
-                answer: "A"
-            },
-            {
-                question: "5. Who agreed to buy Wilbur for $6?",
-                options: ["A. Avery", "B. Fern's teacher", "C. Uncle Homer"],
-                answer: "C"
-            }
+            "1 + 1", "1 + 2", "1 + 3", "1 + 4", "1 + 5", "1 + 6", "1 + 7", "1 + 8", "1 + 9", "2 + 1",
+            "2 + 2", "2 + 3", "2 + 4", "2 + 5", "2 + 6", "2 + 7", "2 + 8", "3 + 1", "3 + 2", "3 + 3",
+            "3 + 4", "3 + 5", "3 + 6", "3 + 7", "4 + 1", "4 + 2", "4 + 3", "4 + 4", "4 + 5", "4 + 6",
+            "5 + 1", "5 + 2", "5 + 3", "5 + 4", "5 + 5", "6 + 1", "6 + 2", "6 + 3", "6 + 4", "7 + 1",
+            "7 + 2", "7 + 3", "8 + 1", "8 + 2", "9 + 1", "2 - 1", "3 - 1", "3 - 2", "4 - 1", "4 - 2",
+            "4 - 3", "5 - 1", "5 - 2", "5 - 3", "5 - 4", "6 - 1", "6 - 2", "6 - 3", "6 - 4", "6 - 5",
+            "7 - 1", "7 - 2", "7 - 3", "7 - 4", "7 - 5", "7 - 6", "8 - 1", "8 - 2", "8 - 3", "8 - 4",
+            "8 - 5", "8 - 6", "8 - 7", "9 - 1", "9 - 2", "9 - 3", "9 - 4", "9 - 5", "9 - 6", "9 - 7",
+            "9 - 8", "10 - 1", "10 - 2", "10 - 3", "10 - 4", "10 - 5", "10 - 6", "10 - 7", "10 - 8", "10 - 9"
         ];
 
-        const correctAnswers = ["B", "C", "A", "A", "C"]; // 正确答案
-        let userAnswers = [];
+        let interval; // 定时器
+        let currentQuestion; // 当前题目
+        let isPaused = false; // 是否暂停
+        let answerDisplayed = false; // 是否已显示答案
 
-        function loadQuestions() {
-            const bookName = document.getElementById('bookName').value;
-            if (bookName === "夏洛的网") {
-                document.getElementById('inputSection').style.display = 'none';
-                document.getElementById('questionSection').style.display = 'block';
+        // 开始滚动题目
+        function startRolling() {
+            clearInterval(interval); // 清除之前的定时器
+            interval = setInterval(() => {
+                currentQuestion = questions[Math.floor(Math.random() * questions.length)]; // 随机选择题目
+                document.getElementById('question').textContent = currentQuestion; // 显示题目
+                answerDisplayed = false; // 重置答案显示状态
+            }, 100); // 每100毫秒切换一次题目
+            document.getElementById('answerBtn').disabled = true; // 禁用查看答案按钮
+            isPaused = false; // 设置为未暂停状态
+        }
 
-                const questionsDiv = document.getElementById('questions');
-                questionsDiv.innerHTML = '';
-                questions.forEach((q, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'question';
-                    div.innerHTML = `
-                        <p>${q.question}</p>
-                        ${q.options.map(opt => `
-                            <label>
-                                <input type="radio" name="question${index}" value="${opt[0]}"> ${opt}
-                            </label><br>
-                        `).join('')}
-                    `;
-                    questionsDiv.appendChild(div);
-                });
-            } else {
-                alert("请输入正确的书名：夏洛的网");
+        // 暂停滚动题目
+        function pauseRolling() {
+            clearInterval(interval); // 清除定时器
+            document.getElementById('answerBtn').disabled = false; // 启用查看答案按钮
+            isPaused = true; // 设置为暂停状态
+        }
+
+        // 显示答案
+        function showAnswer() {
+            if (isPaused && !answerDisplayed) { // 只有在暂停状态且未显示答案时才能查看答案
+                const answer = eval(currentQuestion); // 计算答案
+                document.getElementById('question').textContent = `${currentQuestion} = ${answer}`; // 在等式后面显示答案
+                answerDisplayed = true; // 标记答案已显示
             }
-        }
-
-        function showAnswers() {
-            const questionsDiv = document.getElementById('questions');
-            questions.forEach((q, index) => {
-                const options = questionsDiv.querySelectorAll(`input[name="question${index}"]`);
-                options.forEach(opt => {
-                    const label = opt.parentElement;
-                    if (opt.value === correctAnswers[index]) {
-                        label.classList.add('correct'); // 正确答案显示绿色
-                    } else if (opt.checked && opt.value !== correctAnswers[index]) {
-                        label.classList.add('incorrect'); // 错误答案显示红色
-                    }
-                });
-            });
-        }
-
-        function calculateAccuracy() {
-            userAnswers = [];
-            questions.forEach((q, index) => {
-                const selected = document.querySelector(`input[name="question${index}"]:checked`);
-                userAnswers.push(selected ? selected.value : '');
-            });
-
-            let correctCount = 0;
-            userAnswers.forEach((answer, index) => {
-                if (answer === correctAnswers[index]) {
-                    correctCount++;
-                }
-            });
-
-            const accuracy = (correctCount / questions.length) * 100;
-            alert(`你的正确率是: ${accuracy.toFixed(2)}%`);
         }
     </script>
 </body>
