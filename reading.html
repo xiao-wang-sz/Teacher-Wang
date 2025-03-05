@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生阅读检查系统</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('https://source.unsplash.com/1600x900/?nature,green');
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .question {
+            text-align: left;
+            margin: 20px 0;
+        }
+        .question label {
+            display: block;
+            margin: 10px 0;
+        }
+        .vocab-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .vocab-list {
+            width: 45%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+        }
+        .vocab-list span {
+            display: block;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            margin: 5px 0;
+            cursor: grab;
+        }
+        .vocab-questions {
+            width: 45%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+        }
+        .vocab-questions p {
+            margin: 10px 0;
+            height: 40px; /* 保持题目高度一致 */
+            display: flex;
+            align-items: center;
+        }
+        .drag-area {
+            border: 1px dashed #ccc;
+            padding: 10px;
+            margin: 10px 0;
+            min-height: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .correct {
+            color: green;
+            font-weight: bold;
+        }
+        .incorrect {
+            color: red;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 0.8em;
+            color: #777;
+            text-align: right;
+        }
+        .answers {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .button-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 书名输入页面 -->
+        <div id="book-input">
+            <h1>请输入书名</h1>
+            <input type="text" id="book-name" placeholder="例如：夏洛的网">
+            <button onclick="checkBook()">进入</button>
+        </div>
+
+        <!-- 章节选择页面 -->
+        <div id="chapter-select" style="display: none;">
+            <h1>选择章节</h1>
+            <button onclick="showQuestions('chapter1-2')">Chapter 1-2</button>
+            <button onclick="showQuestions('chapter3-4')">Chapter 3-4</button>
+            <button onclick="showQuestions('chapter5-6')">Chapter 5-6</button>
+            <button onclick="showQuestions('chapter7-8')">Chapter 7-8</button>
+            <button onclick="showQuestions('chapter9-10')">Chapter 9-10</button>
+        </div>
+
+        <!-- 选择题页面 -->
+        <div id="question-page" style="display: none;">
+            <h1>Chapter 1-2 选择题</h1>
+            <div class="question">
+                <p>1. What did Mr. Arable carry inside the carton?</p>
+                <label><input type="radio" name="q1" value="A"> A. some milk</label>
+                <label><input type="radio" name="q1" value="B"> B. a pig</label>
+                <label><input type="radio" name="q1" value="C"> C. some people</label>
+            </div>
+            <div class="question">
+                <p>2. How did Fern go to school?</p>
+                <label><input type="radio" name="q2" value="A"> A. on her bike</label>
+                <label><input type="radio" name="q2" value="B"> B. on foot</label>
+                <label><input type="radio" name="q2" value="C"> C. by bus</label>
+            </div>
+            <div class="question">
+                <p>3. What did Fern give to Wilbur?</p>
+                <label><input type="radio" name="q3" value="A"> A. milk</label>
+                <label><input type="radio" name="q3" value="B"> B. hay</label>
+                <label><input type="radio" name="q3" value="C"> C. some apples</label>
+            </div>
+            <div class="question">
+                <p>4. When was Wilbur born?</p>
+                <label><input type="radio" name="q4" value="A"> A. spring</label>
+                <label><input type="radio" name="q4" value="B"> B. summer</label>
+                <label><input type="radio" name="q4" value="C"> C. fall</label>
+            </div>
+            <div class="question">
+                <p>5. Who agreed to buy Wilbur for $6?</p>
+                <label><input type="radio" name="q5" value="A"> A. Avery</label>
+                <label><input type="radio" name="q5" value="B"> B. Fern's teacher</label>
+                <label><input type="radio" name="q5" value="C"> C. Uncle Homer</label>
+            </div>
+            <div class="button-row">
+                <button onclick="checkAnswers()">Check</button>
+                <button onclick="showCorrectAnswers()">Answers</button>
+            </div>
+            <div id="correct-answers" class="answers" style="display: none;">
+                <p>正确答案：B, C, A, A, C</p>
+            </div>
+            <div class="button-row">
+                <button onclick="showVocab()">下一页</button>
+            </div>
+        </div>
+
+        <!-- 词汇题页面 -->
+        <div id="vocab-page" style="display: none;">
+            <h1>Chapter 1-2 词汇题</h1>
+            <div class="vocab-container">
+                <div class="vocab-list" id="vocab-drag">
+                    <span draggable="true">appetite</span>
+                    <span draggable="true">injustice</span>
+                    <span draggable="true">blush</span>
+                    <span draggable="true">dagger</span>
+                    <span draggable="true">pupil</span>
+                    <span draggable="true">runt</span>
+                    <span draggable="true">holler</span>
+                    <span draggable="true">enchanted</span>
+                    <span draggable="true">suggest</span>
+                    <span draggable="true">wade</span>
+                </div>
+                <div class="vocab-questions">
+                    <p>1. to yell, to talk in a loud voice</p>
+                    <div class="drag-area" id="drag1"></div>
+                    <p>2. a student</p>
+                    <div class="drag-area" id="drag2"></div>
+                    <p>3. a small knife used as a weapon</p>
+                    <div class="drag-area" id="drag3"></div>
+                    <p>4. something happens that is not fair</p>
+                    <div class="drag-area" id="drag4"></div>
+                    <p>5. filled with a magical feeling</p>
+                    <div class="drag-area" id="drag5"></div>
+                    <p>6. to give advice, to tell someone a good idea</p>
+                    <div class="drag-area" id="drag6"></div>
+                    <p>7. a feeling that we want to eat food</p>
+                    <div class="drag-area" id="drag7"></div>
+                    <p>8. a baby animal that is smaller than normal</p>
+                    <div class="drag-area" id="drag8"></div>
+                    <p>9. to walk in water up to your ankles or knees</p>
+                    <div class="drag-area" id="drag9"></div>
+                    <p>10. to turn red when we feel embarrassed</p>
+                    <div class="drag-area" id="drag10"></div>
+                </div>
+            </div>
+            <div class="button-row">
+                <button onclick="checkVocab()">Check</button>
+                <button onclick="showVocabCorrectAnswers()">Answers</button>
+            </div>
+            <div id="vocab-correct-answers" class="answers" style="display: none;">
+                <p>正确答案：1. holler, 2. pupil, 3. dagger, 4. injustice, 5. enchanted, 6. suggest, 7. appetite, 8. runt, 9. wade, 10. blush</p>
+            </div>
+            <div class="button-row">
+                <button onclick="showQuestions('chapter1-2')">上一页</button>
+                <button onclick="nextPage()">下一页</button>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <div class="footer">小王同学制作</div>
+    </div>
+
+    <script>
+        // 检查书名
+        function checkBook() {
+            const bookName = document.getElementById('book-name').value;
+            if (bookName === '夏洛的网') {
+                document.getElementById('book-input').style.display = 'none';
+                document.getElementById('chapter-select').style.display = 'block';
+            } else {
+                alert('请输入正确的书名！');
+            }
+        }
+
+        // 显示选择题页面
+        function showQuestions(chapter) {
+            document.getElementById('chapter-select').style.display = 'none';
+            document.getElementById('question-page').style.display = 'block';
+            document.getElementById('vocab-page').style.display = 'none';
+        }
+
+        // 检查选择题答案
+        function checkAnswers() {
+            const answers = ['B', 'C', 'A', 'A', 'C'];
+            let correctCount = 0;
+            for (let i = 1; i <= 5; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selected && selected.value === answers[i - 1]) {
+                    selected.parentElement.classList.add('correct');
+                    correctCount++;
+                } else if (selected) {
+                    selected.parentElement.classList.add('incorrect');
+                }
+            }
+            alert(`您答对了 ${correctCount} 题！`);
+        }
+
+        // 显示选择题正确答案
+        function showCorrectAnswers() {
+            document.getElementById('correct-answers').style.display = 'block';
+        }
+
+        // 显示词汇题页面
+        function showVocab() {
+            document.getElementById('question-page').style.display = 'none';
+            document.getElementById('vocab-page').style.display = 'block';
+            setupDragAndDrop();
+        }
+
+        // 设置拖拽功能
+        function setupDragAndDrop() {
+            const dragItems = document.querySelectorAll('#vocab-drag span');
+            const dropAreas = document.querySelectorAll('.drag-area');
+
+            dragItems.forEach(item => {
+                item.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text', e.target.innerText);
+                });
+            });
+
+            dropAreas.forEach(area => {
+                area.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                });
+                area.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const data = e.dataTransfer.getData('text');
+                    area.innerText = data;
+                });
+            });
+        }
+
+        // 检查词汇题答案
+        function checkVocab() {
+            const vocabAnswers = ['holler', 'pupil', 'dagger', 'injustice', 'enchanted', 'suggest', 'appetite', 'runt', 'wade', 'blush'];
+            const dropAreas = document.querySelectorAll('.drag-area');
+
+            dropAreas.forEach((area, index) => {
+                if (area.innerText.trim().toLowerCase() === vocabAnswers[index]) {
+                    area.classList.add('correct');
+                } else {
+                    area.classList.add('incorrect');
+                }
+            });
+        }
+
+        // 显示词汇题正确答案
+        function showVocabCorrectAnswers() {
+            document.getElementById('vocab-correct-answers').style.display = 'block';
+        }
+
+        // 下一页功能
+        function nextPage() {
+            alert('这是最后一页！');
+        }
+    </script>
+</body>
+</html>
